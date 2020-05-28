@@ -1,20 +1,45 @@
 
-FILES = src/main.cpp
+# archivos a compilar
+TARGET    := button
 
+SRC_DIR   := src/
+OBJ_DIR   := obj/
+SRC_FILES := $(wildcard $(SRC_DIR)*.cpp)
+# Archivos de objeto
+OBJ_FILES := $(patsubst $(SRC_DIR)%.cpp,$(OBJ_DIR)%.o,$(SRC_FILES))
+DEP_FILES := $(patsubst $(SRC_DIR)%.cpp,$(OBJ_DIR)%.d,$(SRC_FILES))
+
+# librerias
 UWS      = ./lib/uWebSockets
 USOCKETS = $(UWS)/uSockets
 
-CPPFLAGS += -O2 -std=c++17
+# opciones para el compilador
+CPPFLAGS += -O2 -std=c++17 -Wall
 CPPFLAGS += -I$(UWS)/src/
 CPPFLAGS += -I$(USOCKETS)/src/
 
+# opciones para el linker
 LDFLAGS += -L$(USOCKETS)
 LDFLAGS += -l z -l ssl -l:uSockets.a
 
-OUT = button
+# nombre del ejecutable final
 
-all: $(USOCKETS)/uSockets.a
-	g++ $(CPPFLAGS) $(FILES) $(LDFLAGS) -o $(OUT)
+# receta por defecto de make, depende de la libreria uSockets.a
+all: $(TARGET)
 
+$(TARGET): $(OBJ_FILES) $(USOCKETS)/uSockets.a
+	g++ -o $@ $^ $(LDFLAGS)
+	
+$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
+	g++ -MMD -MP $(CPPFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(TARGET) $(OBJ_FILES) $(DEP_FILES)
+	
+
+# receta para hacer uSockets.a, ejecuta make en su carpeta
 $(USOCKETS)/uSockets.a:
 	make -C $(USOCKETS)
+
+
+-include $(DEP_FILES)

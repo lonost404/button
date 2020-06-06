@@ -20,6 +20,7 @@ public:
 	virtual ~Object();
 	
 	virtual void click();
+	
 	virtual char * bufWrite(char * buf);
 	virtual int bufSize() const;
 };

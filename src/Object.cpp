@@ -25,7 +25,7 @@ char * Object::bufWrite(char * buf) {
 }
 	
 int Object::bufSize() const {
-	return sizeof(typeId)
+	return sizeof(uint8_t)
 		+ sizeof(posX) + sizeof(posY)
 		+ sizeof(width) + sizeof(height);
 }
